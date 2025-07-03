@@ -2,7 +2,7 @@ name: Agendador
 
 on:
   schedule:
-    - cron: '8 14 * * *'  # Executa todos os dias às 03:00 UTC
+    - cron: '14 14 * * *'  # Executa todos os dias às 03:00 UTC
   workflow_dispatch:     # Permite execução manual também (opcional)
 
 jobs:
