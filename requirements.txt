@@ -1,0 +1,8 @@
+pandas
+PyMuPDF
+beautifulsoup4
+jinja2
+pydantic
+requests
+google-generativeai
+python-dotenv
