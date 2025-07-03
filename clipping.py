@@ -498,6 +498,18 @@ def main():
         except FileNotFoundError:
             logger.error(f"Erro: O arquivo {FILEPATH_INTERESSADOS} não foi encontrado. Por favor, crie-o com as colunas necessárias.")
             return
+        
+        RECIPIENT_MAPPING = {}
+        recipient_mapping_str = os.getenv("RECIPIENT_MAPPING")
+        if recipient_mapping_str:
+            try:
+                RECIPIENT_MAPPING = json.loads(recipient_mapping_str)
+                logger.info("Mapeamento de destinatários carregado com sucesso do secret.")
+            except json.JSONDecodeError as e:
+                logger.error(f"Erro ao decodificar RECIPIENT_MAPPING do secret: {e}. Certifique-se de que é um JSON válido.")
+                # Continuar com RECIPIENT_MAPPING vazio
+        else:
+            logger.warning("RECIPIENT_MAPPING secret não encontrado ou vazio. Verifique a configuração dos secrets no GitHub.")
 
         logger.info(f"Acessando {GMAIL_USER} para captura das informações.")
 
@@ -521,7 +533,10 @@ def main():
             setor_sigla = row['setor_sigla']
             setor_descricao = row['setor_descricao']
             setor_interesse = row['setor_interesse']
-            destinatarios = [email.strip() for email in row['destinatarios'].split(';')]
+            destinatarios = RECIPIENT_MAPPING.get(setor_sigla, [])
+            if not destinatarios:
+                logger.warning(f"Nenhum destinatário configurado para a sigla '{setor_sigla}' no secret RECIPIENT_MAPPING. Pulando envio para este setor.")
+                continue # 
 
             logger.info('')
             logger.info(f"Processando cliente: {setor_descricao} ({setor_sigla}).")
